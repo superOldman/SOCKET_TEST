@@ -1,0 +1,27 @@
+.DS_Store
+dist/
+node_modules
+unused-files.json
+
+# local env files
+.env.local
+.env.*.local
+resetFile.sh
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sw?
+
+yarn.local
+**/*.local
+**/*.local.js

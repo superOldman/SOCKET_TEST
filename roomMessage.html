@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Socket.IO chat</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font: 13px Helvetica, Arial;
+    }
+
+    .form {
+      background: #000;
+      padding: 3px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .form input {
+      border: 0;
+      padding: 10px;
+      width: 90%;
+      margin-right: .5%;
+    }
+
+    .form button {
+      width: 9%;
+      background: rgb(130, 224, 255);
+      border: none;
+      padding: 10px;
+    }
+
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #messages li {
+      padding: 5px 10px;
+    }
+
+    #messages li:nth-child(odd) {
+      background: #eee;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div>
+    创建名字
+    <input id="createName" type="text">
+    <button id="createNameBtn">创建名字</button>
+  </div>
+  <div id="room"></div>
+  <ul id="messages"></ul>
+  <div class="form">
+    <input id="m" autocomplete="off" /><button id="btn">Send</button>
+  </div>
+  <script src="socket.io.js"></script>
+  <script>
+    // http://sicilymarmot.top:3333/
+    const url = 'http://localhost:3333/'
+    const btn = document.getElementById('btn')
+    const cn = document.getElementById('createName')
+    const cnb = document.getElementById('createNameBtn')
+    const ipt = document.getElementById('m')
+    const Msg = document.getElementById('messages')
+    const room = document.getElementById('room')
+    let myName = null
+    let socket = null
+
+
+    function initRoom() {
+      socket = io(url);
+      listenSocket()
+    }
+
+
+    handle()
+    function handle() {
+      btn.onclick = function () {
+        if (myName) {
+          socket.emit('chat message', ipt.value);
+        } else {
+          alert('没有名字')
+        }
+      }
+      cnb.onclick = function () {
+        if (socket) {
+          alert('你已经加入了房间')
+          return
+        } else {
+          if (cn.value) {
+            myName = cn.value
+            initRoom()
+            socket.emit('new user', cn.value);
+          }
+        }
+      }
+    }
+
+    function listenSocket() {
+      socket.on('chat message', function (msg) {
+        // debugger
+        showMsg(`${msg.name}:${msg.msg}`)
+      });
+      socket.on('new user', msg => {
+        showMsg('用户：' + msg.name + '加入聊天')
+      });
+      socket.on('room users', data => {
+        room.innerText = JSON.stringify(data)
+      })
+      socket.on('leave message', data => {
+        showMsg(data.msg)
+      })
+    }
+
+    function showMsg(msg, dom = Msg) {
+      const li = document.createElement('li')
+      li.innerText = msg
+      dom.appendChild(li)
+    }
+
+  </script>
+</body>
+
+</html>
